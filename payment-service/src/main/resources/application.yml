@@ -1,0 +1,39 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/payment_db}
+    username: ${DB_USER:saga}
+    password: ${DB_PASSWORD:saga}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration/payment
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    producer:
+      acks: all
+
+# Simulated payment gateway: charges above this amount are declined.
+# Customers whose id contains "DECLINE" (any case) are always declined - handy for demos and tests.
+payment:
+  max-amount: ${PAYMENT_MAX_AMOUNT:1000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.hibernate.orm.deprecation: ERROR
